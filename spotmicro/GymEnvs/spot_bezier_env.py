@@ -1,17 +1,17 @@
-""" This file implements the gym environment of SpotMicro with Bezier Curve.
+""" This file implements the gymnasium environment of SpotMicro with Bezier Curve.
 """
 import math
 import time
-import gym
+import gymnasium as gym
 import numpy as np
 import pybullet
 import pybullet_data
-from gym import spaces
-from gym.utils import seeding
+from gymnasium import spaces
+from gymnasium.utils import seeding
 from pkg_resources import parse_version
 from spotmicro import spot
 import pybullet_utils.bullet_client as bullet_client
-from gym.envs.registration import register
+from gymnasium.envs.registration import register
 from spotmicro.OpenLoopSM.SpotOL import BezierStepper
 from spotmicro.spot_gym_env import spotGymEnv
 import spotmicro.Kinematics.LieAlgebra as LA
@@ -19,7 +19,7 @@ from spotmicro.spot_env_randomizer import SpotEnvRandomizer
 
 SENSOR_NOISE_STDDEV = spot.SENSOR_NOISE_STDDEV
 
-# Register as OpenAI Gym Environment
+# Register as OpenAI gymnasium Environment
 register(
     id="SpotMicroEnv-v1",
     entry_point='spotmicro.GymEnvs.spot_bezier_env:spotBezierEnv',
@@ -28,7 +28,7 @@ register(
 
 
 class spotBezierEnv(spotGymEnv):
-    """The gym environment for spot.
+    """The gymnasium environment for spot.
 
   It simulates the locomotion of spot, a quadruped robot. The state space
   include the angles, velocities and torques for all the motors and the action

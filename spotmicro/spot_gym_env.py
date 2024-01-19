@@ -1,17 +1,17 @@
-""" This file implements the gym environment of SpotMicro.
+""" This file implements the gymnasium environment of SpotMicro.
 """
 import math
 import time
-import gym
+import gymnasium as gymnasium
 import numpy as np
 import pybullet
 import pybullet_data
-from gym import spaces
-from gym.utils import seeding
+from gymnasium import spaces
+from gymnasium.utils import seeding
 from pkg_resources import parse_version
 from spotmicro import spot
 import pybullet_utils.bullet_client as bullet_client
-from gym.envs.registration import register
+from gymnasium.envs.registration import register
 from spotmicro.heightfield import HeightField
 from spotmicro.OpenLoopSM.SpotOL import BezierStepper
 import spotmicro.Kinematics.LieAlgebra as LA
@@ -33,7 +33,7 @@ NUM_SIMULATION_ITERATION_STEPS = 1000
 
 spot_URDF_VERSION_MAP = {DEFAULT_URDF_VERSION: spot.Spot}
 
-# Register as OpenAI Gym Environment
+# Register as OpenAI gymnasium Environment
 register(
     id="SpotMicroEnv-v0",
     entry_point='spotmicro.spot_gym_env:spotGymEnv',
@@ -49,8 +49,8 @@ def convert_to_list(obj):
         return [obj]
 
 
-class spotGymEnv(gym.Env):
-    """The gym environment for spot.
+class SpotGymEnv(gymnasium.Env):
+    """The gymnasium environment for spot.
 
   It simulates the locomotion of spot, a quadruped robot. The state space
   include the angles, velocities and torques for all the motors and the action
@@ -104,7 +104,7 @@ class spotGymEnv(gym.Env):
                  draw_foot_path=False,
                  height_field=False,
                  AutoStepper=False):
-        """Initialize the spot gym environment.
+        """Initialize the spot gymnasium environment.
 
     Args:
       urdf_root: The path to the urdf data folder.
@@ -288,7 +288,8 @@ class spotGymEnv(gym.Env):
               initial_motor_angles=None,
               reset_duration=1.0,
               desired_velocity=None,
-              desired_rate=None):
+              desired_rate=None,
+              seed=None):
         # Use Autostepper
         if self.AutoStepper:
             self.StateMachine = BezierStepper(dt=self._time_step)
@@ -361,7 +362,7 @@ class spotGymEnv(gym.Env):
             self._cam_dist, self._cam_yaw, self._cam_pitch, [0, 0, 0])
         self._pybullet_client.configureDebugVisualizer(
             self._pybullet_client.COV_ENABLE_RENDERING, 1)
-        return self._get_observation()
+        return self._get_observation(), {}
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -421,7 +422,7 @@ class spotGymEnv(gym.Env):
         # DRAW FOOT PATH
         if self.draw_foot_path:
             self.DrawFootPath()
-        return np.array(self._get_observation()), reward, done, {}
+        return np.array(self._get_observation()), reward, done, False, {}
 
     def render(self, mode="rgb_array", close=False):
         if mode != "rgb_array":
@@ -686,7 +687,7 @@ class spotGymEnv(gym.Env):
         self._observation = self.spot.RealisticObservation()
         return self._observation
 
-    if parse_version(gym.__version__) < parse_version('0.9.6'):
+    if parse_version(gymnasium.__version__) < parse_version('0.9.6'):
         _render = render
         _reset = reset
         _seed = seed
